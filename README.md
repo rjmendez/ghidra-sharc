@@ -25,7 +25,9 @@ memory map.
 3. Import a `.ldr` boot stream (the loader is picked automatically), or a raw
    image with language `SHARC:BE:32:214xx`.
 
-If your Ghidra version has no zip, build one (below).
+Zips are built and smoke-tested for Ghidra 12.0.4, 12.1.3 and 12.1.4 (the
+matrix in `.github/workflows/build.yml`).  For another version, build one
+(below).
 
 ## Build
 
