@@ -1,0 +1,111 @@
+# SHARC
+
+SLEIGH specification for the Analog Devices
+ADSP-214xx SHARC (ADSP-21467/21469, 21477-21479, 21483-21489): the 48-bit
+SHARC instruction set (ISA) and the Variable Instruction Set Architecture
+(VISA) of 16-, 32- and 48-bit instructions.  Language `SHARC:BE:32:214xx`.
+
+References: *SHARC Processor Programming Reference* (ADSP-2136x/2137x/214xx,
+rev 2.2) for the instruction set and the ADSP-214xx datasheets for the memory
+map.
+
+## Model
+
+* **Code space.** One code space, `sw`, whose addressable unit is a 16-bit
+  short word.  VISA code sits at its short-word (SW) address.  48-bit ISA code
+  is placed at the SW *alias* of its 48-bit address -- the three short words
+  holding it in the same SRAM column, `SW = 3*A - (A & 0xe0000)` for internal
+  blocks 0-3 (block 0: `0x8c000 -> 0x124000`) -- most significant parcel
+  first, so a program holds both kinds of code exactly as they overlap in
+  memory.  The context bit `visa` selects the decoder; the interrupt vector
+  table (`0x8c000-0x8c0ff`, `sw:124000-sw:1242ff`) is 48-bit code and its
+  vectors are entry points (`sharc214xx.pspec`).  Other 48-bit ranges must be
+  marked by whoever loads the image (`visa` = 0).
+* **Data space.** `dm` has 32-bit units (normal-word addresses): internal
+  memory, external memory and the IOP registers (volatile).  PM data accesses
+  use the same space.
+* **Branch targets.** Absolute and PC-relative targets are mapped the same
+  way: an address in `0x80000-0xfffff` is a 48-bit address and goes to its SW
+  alias.  VISA code reaches 48-bit stubs with PC-relative jumps whose offset
+  crosses the address spaces; these land on the stub.  Computed targets in ISA
+  code (where code pointers are 48-bit addresses) are mapped in p-code.
+* **Parallel instructions.** A compute and its data moves read their sources
+  before anything is written (`R8 = R8 + R1, DM(I0,M1) = R8` stores the old
+  R8).  Conditional instructions exist once per condition and once for TRUE,
+  so unconditional code carries no dead branches.
+* **Flags.** The ALU sets AZ/AN, the multiplier MN (condition MS), the shifter
+  SZ; BIT TST/XOR set BTF.  `NOT LCE` is `CURLCNTR != 1`.
+* **Arithmetic.** Fixed and floating ALU, integer multiply exact, fractional
+  multiply as 1.31, shifts and immediate bit-field extract/deposit exact.
+  CLIP, SCALB, MANT, LOGB, RECIPS, RSQRTS, COPYSIGN, register-count FEXT/FDEP,
+  MR accumulator operations and saturation are user operations.
+
+## Hardware loops
+
+`DO <end> UNTIL <term>` marks its loop's last instruction with context
+(`lend`, `lterm`, `ltop`); the root table adds the loop-back there, so the
+decompiler sees an ordinary loop:
+
+* `UNTIL LCE`: after the last instruction `CURLCNTR` counts down and the loop
+  repeats while it is not zero (a count of 0 runs 2^32 times, as on the part);
+* `UNTIL FOREVER`: always repeats;
+* `UNTIL <condition>`: repeats while the condition is false, tested after the
+  last instruction (the hardware tests it in the pipeline; the result is the
+  same for loops that obey the manual's end-of-loop restrictions).
+
+The loop-counter stack is six registers `LCSTK0-5`; DO and `PUSH LOOP` push
+`CURLCNTR`, the end of the loop, `POP LOOP` and `JUMP (LA)` pop it, so nested
+loops restore their counts and the bookkeeping folds away.
+
+In VISA code the last four instructions of a loop are always 48-bit
+instructions (Programming Reference, "VISA-Related Restrictions on Hardware
+Loops"), so the end address is always an instruction start.  The `globalset`
+in the DO only affects later disassembly: a loop end disassembled before its
+DO keeps its plain decoding.
+
+## Delayed branches
+
+A `(DB)` branch executes the next two instructions. Ghidra collects delay-slot
+instructions until their lengths reach a byte count, and VISA instructions are
+2, 4 or 6 bytes long, so no single count gives two instructions: it must be
+one more than the length of the first slot. The `DS` subtable takes that
+length from the context field `dslot` of the branch (0 = 2 bytes, the default
+and the common case; 1 = 4; 2 = 6), which has to be set where the first slot
+is longer. ISA delay slots are always 12 bytes. The branch condition is
+evaluated before the slots, and the not-taken path continues after them.
+
+## C run-time conventions (VisualDSP++ / CrossCore)
+
+* `CJUMP` / `RFRAME` frame handling; `JUMP (M14, I12) (DB)` is the return.
+* The compiler spec gives the argument registers (R4, R8, R12), the result
+  (R0), the callee-preserved set, and tracks the constant modifier registers
+  (M5 = M13 = 0, M6 = M14 = 1, M7 = M15 = -1) at every function entry.
+
+## Known limitations
+
+* SIMD (PEy), circular buffering (`L`/`B` registers), bit-reversed
+  addressing and long-word (`LW`) moves are not modelled: data address
+  generators update linearly and moves are 32-bit.
+* The status and PC stacks (`PUSH/POP STS`, `PCSTK`), cache control, IDLE and
+  RTI's status restore are user operations.
+* Disassembly alone gives a VISA delayed branch one slot when the first is
+  32 or 48 bits long (`dslot` defaults to 0).
+* A loop whose end lies before its DO (the ADI boot kernel's FINAL_INIT
+  sequence) is not modelled: the DO's mark conflicts with the existing
+  decoding of the reset vector, and Ghidra reports inconsistent context there.
+* Code pointers held as 48-bit addresses in data or registers (ISA programs)
+  are not mapped to the code space by Ghidra's pointer and reference
+  analysis; functions reached only through them need a manual entry point.
+  Where such a pointer is not constant the decompiler shows the mapping
+  expression of the indirect call.
+* The IVT entry points and the memory map are those of the 5-Mbit
+  ADSP-2146x/2147x/2148x.
+
+## Regenerating
+
+`sharc214xx.sinc` is generated from the opcode tables in `tools/sharc_isa.py`:
+
+    python3 tools/gen_sinc.py
+
+`sharc214xx.slaspec` is written by hand: spaces, registers, context, macros,
+the `DS`, `LoopTop` and `ISA` subtables and the root table.
