@@ -255,7 +255,7 @@ IMM_SHIFT_SEM = {
     0x20: ("{n} = {n} | ({x} << {k}); " + SHZ, "{n} = {n} | ({x} >> -{k}); " + SHZ),
     0x24: ("{n} = {n} | ({x} << {k}); " + SHZ, "{n} = {n} | ({x} s>> -{k}); " + SHZ),
 }
-# Bit-field extract/deposit with an immediate bit6:len6 (PGR ch. 11 "Shifter Operations");
+# Bit-field extract/deposit with an immediate bit6:len6 (PGR ch. 11 "Shifter/Shift Immediate Computations");
 # {b} = bit6, {l} = len6.  Computed in 64 bits so that len6 = 32 needs no special case.
 FIELD_SEM = {
     0x40: "local fv:8 = (zext({x}) >> {b}) & ((1 << {l}) - 1); {n} = fv:4;",
@@ -442,7 +442,7 @@ class Compute:
 
 
 # ------------------------------------------------------------------ conditions
-# Condition codes (PGR Table 9-2).  15 is NOT LCE: the loop counter expires on the
+# Condition codes (PGR Table 10-4; meanings in Table 4-37).  15 is NOT LCE: the loop counter expires on the
 # iteration in which CURLCNTR is 1.  31 is TRUE (no IF displayed).
 COND_EXPR = {0: "AZ", 1: "AN", 2: "AN | AZ", 3: "AC", 4: "AV", 5: "MV", 6: "MS", 7: "SV",
              8: "SZ", 9: "FLAG0", 10: "FLAG1", 11: "FLAG2", 12: "FLAG3", 13: "BTF", 14: "BM",

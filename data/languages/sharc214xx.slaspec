@@ -64,7 +64,7 @@ define pcodeop rsqrts;     define pcodeop copysign;  define pcodeop rot;
 define pcodeop shiftop;    define pcodeop mrop;      define pcodeop bitrev;
 define pcodeop idle;       define pcodeop emuidle;   define pcodeop stackop;
 
-# Status flags that conditions read (PGR Table 9-2): the ALU sets AZ/AN, the multiplier
+# Status flags that conditions read (PGR Table 4-37): the ALU sets AZ/AN, the multiplier
 # MN (condition MS), the shifter SZ.  Overflow and saturation flags are not modelled.
 macro setfix(r)  { AZ = (r == 0); AN = (r s< 0); }
 macro setflt(r)  { AZ = (r f== 0:4); AN = (r f< 0:4); }
