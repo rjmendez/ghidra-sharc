@@ -1,13 +1,14 @@
 # SHARC
 
-SLEIGH specification and analyzers for the Analog Devices
+SLEIGH specification, analyzers and boot-stream loader for the Analog Devices
 ADSP-214xx SHARC (ADSP-21467/21469, 21477-21479, 21483-21489): the 48-bit
 SHARC instruction set (ISA) and the Variable Instruction Set Architecture
 (VISA) of 16-, 32- and 48-bit instructions.  Language `SHARC:BE:32:214xx`.
 
 References: *SHARC Processor Programming Reference* (ADSP-2136x/2137x/214xx,
-rev 2.2) for the instruction set and the ADSP-214xx datasheets for the memory
-map.
+rev 2.2) for the instruction set, *VisualDSP++ 5.0 Loader and Utilities
+Manual* (rev 2.5) for the boot stream, and the ADSP-214xx datasheets for the
+memory map.
 
 ## Model
 
@@ -19,8 +20,9 @@ map.
   first, so a program holds both kinds of code exactly as they overlap in
   memory.  The context bit `visa` selects the decoder; the interrupt vector
   table (`0x8c000-0x8c0ff`, `sw:124000-sw:1242ff`) is 48-bit code and its
-  vectors are entry points (`sharc214xx.pspec`).  Other 48-bit ranges must be
-  marked by whoever loads the image (`visa` = 0).
+  vectors are entry points (`sharc214xx.pspec`).  Other 48-bit ranges are
+  marked (`visa` = 0) by the boot-stream loader below, or by whoever loads the
+  image.
 * **Data space.** `dm` has 32-bit units (normal-word addresses): internal
   memory, external memory and the IOP registers (volatile).  PM data accesses
   use the same space.
@@ -89,6 +91,19 @@ after them.
 * The **SHARC Function Pointer Arguments** analyzer creates functions at code
   addresses that constant propagation finds passed as call arguments, e.g. an
   interrupt handler given to the run time's `interrupt()`.
+
+## Boot streams
+
+The **ADI SHARC Boot Stream (LDR)** loader imports a loader file of
+tag/count/address blocks, with or without the 256-instruction boot kernel in
+front: FINAL_INIT, ZERO_LDATA, ZERO_L48, INIT_L16, INIT_L32, INIT_L48,
+INIT_L64, ZERO/INIT_EXT8/16 and compressed (tag `0x2000`, zlib) blocks, which
+are inflated and replayed in place.  The stream is replayed into a model of
+the internal SRAM blocks and external memory, so later blocks overwrite
+earlier ones as on the part, and the memory at hand-over is presented as each
+block's short-word view in `sw` (48-bit code at its alias, with `visa`
+cleared) and normal-word view in `dm`.  The IVT's vectors become entry
+points.  MULTI_PROC streams are not supported.
 
 ## Known limitations
 
