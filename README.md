@@ -1,6 +1,6 @@
 # SHARC
 
-SLEIGH specification for the Analog Devices
+SLEIGH specification and analyzers for the Analog Devices
 ADSP-214xx SHARC (ADSP-21467/21469, 21477-21479, 21483-21489): the 48-bit
 SHARC instruction set (ISA) and the Variable Instruction Set Architecture
 (VISA) of 16-, 32- and 48-bit instructions.  Language `SHARC:BE:32:214xx`.
@@ -59,27 +59,36 @@ loops restore their counts and the bookkeeping folds away.
 
 In VISA code the last four instructions of a loop are always 48-bit
 instructions (Programming Reference, "VISA-Related Restrictions on Hardware
-Loops"), so the end address is always an instruction start.  The `globalset`
-in the DO only affects later disassembly: a loop end disassembled before its
-DO keeps its plain decoding.
+Loops"), so the end address is always an instruction start.  The **SHARC Loop
+End** analyzer re-marks a loop end that was disassembled before its DO (the
+`globalset` in the DO only affects later disassembly).
 
 ## Delayed branches
 
-A `(DB)` branch executes the next two instructions. Ghidra collects delay-slot
-instructions until their lengths reach a byte count, and VISA instructions are
-2, 4 or 6 bytes long, so no single count gives two instructions: it must be
-one more than the length of the first slot. The `DS` subtable takes that
-length from the context field `dslot` of the branch (0 = 2 bytes, the default
-and the common case; 1 = 4; 2 = 6), which has to be set where the first slot
-is longer. ISA delay slots are always 12 bytes. The branch condition is
-evaluated before the slots, and the not-taken path continues after them.
+A `(DB)` branch executes the next two instructions.  Ghidra collects
+delay-slot instructions until their lengths reach a byte count, and VISA
+instructions are 2, 4 or 6 bytes long, so no single count gives two
+instructions: it must be one more than the length of the first slot.  The
+`DS` subtable takes that length from the context field `dslot` of the branch
+(0 = 2 bytes, the default and the common case; 1 = 4; 2 = 6).  The **SHARC
+Delay Slot** analyzer sets `dslot` where the first slot is longer and
+re-disassembles the branch.  ISA delay slots are always 12 bytes.  The branch
+condition is evaluated before the slots, and the not-taken path continues
+after them.
 
 ## C run-time conventions (VisualDSP++ / CrossCore)
 
 * `CJUMP` / `RFRAME` frame handling; `JUMP (M14, I12) (DB)` is the return.
+* The compiler also calls through ordinary delayed jumps, pushing the return
+  address in a delay slot (`DM(I7,M7) = PC`, or in VISA code the constant
+  return address - 1).  The **SHARC Call Idiom** analyzer marks these jumps
+  (direct and `JUMP (M13, Ix) (DB)`) as calls.
 * The compiler spec gives the argument registers (R4, R8, R12), the result
   (R0), the callee-preserved set, and tracks the constant modifier registers
   (M5 = M13 = 0, M6 = M14 = 1, M7 = M15 = -1) at every function entry.
+* The **SHARC Function Pointer Arguments** analyzer creates functions at code
+  addresses that constant propagation finds passed as call arguments, e.g. an
+  interrupt handler given to the run time's `interrupt()`.
 
 ## Known limitations
 
@@ -88,8 +97,8 @@ evaluated before the slots, and the not-taken path continues after them.
   generators update linearly and moves are 32-bit.
 * The status and PC stacks (`PUSH/POP STS`, `PCSTK`), cache control, IDLE and
   RTI's status restore are user operations.
-* Disassembly alone gives a VISA delayed branch one slot when the first is
-  32 or 48 bits long (`dslot` defaults to 0).
+* Delay slots are correct only after the SHARC Delay Slot analyzer has run;
+  disassembly alone gives one slot when the first is 32 or 48 bits long.
 * A loop whose end lies before its DO (the ADI boot kernel's FINAL_INIT
   sequence) is not modelled: the DO's mark conflicts with the existing
   decoding of the reset vector, and Ghidra reports inconsistent context there.
