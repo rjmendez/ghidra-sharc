@@ -1,14 +1,42 @@
-# SHARC
+# SHARC for Ghidra
 
-SLEIGH specification, analyzers and boot-stream loader for the Analog Devices
-ADSP-214xx SHARC (ADSP-21467/21469, 21477-21479, 21483-21489): the 48-bit
-SHARC instruction set (ISA) and the Variable Instruction Set Architecture
-(VISA) of 16-, 32- and 48-bit instructions.  Language `SHARC:BE:32:214xx`.
+A Ghidra processor extension for the Analog Devices ADSP-214xx SHARC
+(ADSP-21467/21469, 21477-21479, 21483-21489): the 48-bit SHARC instruction set
+(ISA) and the Variable Instruction Set Architecture (VISA) of 16-, 32- and
+48-bit instructions.  It adds:
+
+| | |
+|---|---|
+| `SHARC:BE:32:214xx` | the language (ISA + VISA, short-word code space) |
+| **ADI SHARC Boot Stream (LDR)** loader | imports `.ldr` boot streams, with or without the boot kernel |
+| **SHARC Delay Slot**, **Loop End**, **Call Idiom**, **Function Pointer Arguments** analyzers | see below |
 
 References: *SHARC Processor Programming Reference* (ADSP-2136x/2137x/214xx,
 rev 2.2) for the instruction set, *VisualDSP++ 5.0 Loader and Utilities
 Manual* (rev 2.5) for the boot stream, and the ADSP-214xx datasheets for the
 memory map.
+
+## Install
+
+1. Download the zip for your exact Ghidra version from
+   [Releases](../../releases) (`ghidra_<version>_PUBLIC_<date>_SHARC.zip`).
+   Ghidra refuses extensions built for another version.
+2. In Ghidra: **File > Install Extensions**, **+**, pick the zip, restart.
+3. Import a `.ldr` boot stream (the loader is picked automatically), or a raw
+   image with language `SHARC:BE:32:214xx`.
+
+If your Ghidra version has no zip, build one (below).
+
+## Build
+
+Needs the target Ghidra release, JDK 21 and Python 3.
+
+    GHIDRA_INSTALL_DIR=/path/to/ghidra_12.1.4_PUBLIC tools/build.sh
+    # -> dist/ghidra_12.1.4_PUBLIC_<date>_SHARC.zip
+
+`tools/build.sh --install` then `tests/smoke.sh` runs the smoke tests in a
+headless Ghidra; neither touches your own Ghidra settings (see `tools/env.sh`).
+`DEBUG=1` shows the tools' full output.
 
 ## Model
 
@@ -140,9 +168,12 @@ points.  MULTI_PROC streams are not supported.
 
 ## Regenerating
 
-`sharc214xx.sinc` is generated from the opcode tables in `tools/sharc_isa.py`:
-
-    python3 tools/gen_sinc.py
+`sharc214xx.sinc` is generated from the opcode tables in `tools/sharc_isa.py`
+by `tools/regen.sh` (CI fails if the committed file is stale).
 
 `sharc214xx.slaspec` is written by hand: spaces, registers, context, macros,
 the `DS`, `LoopTop` and `ISA` subtables and the root table.
+
+## License
+
+Apache License 2.0, as Ghidra.  See [NOTICE.md](NOTICE.md) for sources.
