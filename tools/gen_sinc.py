@@ -564,10 +564,17 @@ def instr_types():
     ureg29 = FL.regs(29, 23, UREG)                  # type 3 ureg
     ureg38 = FL.regs(38, 32, UREG)                  # types 14,15a,17
     dest5 = FL.regs(29, 23, UREG, kind="d")         # type 5 dest (same bits as ureg29)
+    # Loading Bn also loads In (PGR "Circular Buffering Mode": "When the B register is
+    # loaded, the corresponding I register is simultaneously loaded with the same value").
+    # A companion field over the same ureg bits names In for the B codes and the scratch
+    # register BIX (never read) for every other code; each ureg load writes both.
+    bi_regs = [f"I{k - 64}" if 64 <= k < 80 else "BIX" for k in range(128)]
+    bi29 = FL.regs(29, 23, bi_regs, kind="bi")
+    bi38 = FL.regs(38, 32, bi_regs, kind="bi")
     nocomp = f"{f(22, 16)}=0x3f"                    # VISA 32-bit form: compute field absent
     cnt = [0]
 
-    def mem(space_g, d, ir, mr, reg, post=True, lw=False):
+    def mem(space_g, d, ir, mr, reg, post=True, lw=False, bi=None):
         """Display and p-code for a DAG access; ir/mr are operand fields (mr may be an
         immediate).  Returns (display, pre, post): `pre` captures a stored register before
         any compute in the same instruction writes it (all sources are read before any
@@ -586,7 +593,8 @@ def instr_types():
         upd = f" {ir} = {ir} + {mr};" if post else ""
         if d:
             return dsp, f"local sv{n}:4 = {reg};", f"*[dm]:4 {addr} = sv{n};{upd}"
-        return dsp, "", f"local lv{n}:4 = *[dm]:4 {addr};{upd} {reg} = lv{n};"
+        also = f" {bi} = lv{n};" if bi else ""
+        return dsp, "", f"local lv{n}:4 = *[dm]:4 {addr};{upd} {reg} = lv{n};{also}"
 
     def cond_body(cc, *stmts):
         """A conditional non-branch instruction: everything is skipped when `cc` is false."""
@@ -653,9 +661,10 @@ def instr_types():
         for uu in (0, 1):
             for dd in (0, 1):
                 for ll in (0, 1):
-                    dsp, pre, pc = mem(gg, dd, ir, mr, ureg29, post=bool(uu), lw=bool(ll))
+                    dsp, pre, pc = mem(gg, dd, ir, mr, ureg29, post=bool(uu), lw=bool(ll),
+                                       bi=None if dd else bi29)
                     base = (f"{f(47, 45)}=2 & {u}={uu} & {g}={gg} & {d_}={dd} & {lw}={ll} & "
-                            f"{ir} & {mr} & {ureg29}")
+                            f"{ir} & {mr} & {ureg29}" + ("" if dd else f" & {bi29}"))
                     out.append(f"instr: MOVE CC^CMP48s^{dsp} is ({base} & CC) ... & CMP48s "
                                f"{{ {cond_body('CC', pre, 'build CMP48s;', pc)} }}")
                     out.append(f"instr: MOVE CC^{dsp} is visa=1 & {base} & CC & {nocomp} "
@@ -687,8 +696,8 @@ def instr_types():
     for code, nm in enumerate(UREG):
         srcsub.append(f'SRCU: "{nm}" is {srch}={code >> 2} & {srcl}={code & 3} {{ export {nm}; }}')
     out.append("\n".join(srcsub))
-    base5 = f"{f(47, 43)}=0xE & {dest5} & SRCU"
-    mv5 = f"{dest5} = t5;"
+    base5 = f"{f(47, 43)}=0xE & {dest5} & {bi29} & SRCU"
+    mv5 = f"{dest5} = t5; {bi29} = t5;"
     out.append(f'instr: MOVE CC^CMP48s^{dest5}^" = "^SRCU is ({base5} & CC) ... & CMP48s '
                f'{{ {cond_body("CC", "local t5:4 = SRCU;", "build CMP48s;", mv5)} }}')
     out.append(f'instr: MOVE CC^{dest5}^" = "^SRCU is visa=1 & {base5} & CC & {nocomp} '
@@ -916,8 +925,8 @@ def instr_types():
                     pc = f"local ea:4 = a32; *[dm]:4 ea = {ureg38};"
                 else:
                     dsp = f'{ureg38}^" = {sp}("^a32^")"{lws}'
-                    pc = f"local ea:4 = a32; {ureg38} = *[dm]:4 ea;"
-                out.append(f"instr: MOVE {dsp} is {f(47, 42)}=0x04 & {f(41, 41)}={gg} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg38} & {a32hi} ; {lo16} "
+                    pc = f"local ea:4 = a32; {ureg38} = *[dm]:4 ea; {bi38} = {ureg38};"
+                out.append(f"instr: MOVE {dsp} is {f(47, 42)}=0x04 & {f(41, 41)}={gg} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg38} & {bi38} & {a32hi} ; {lo16} "
                            f"[ a32 = ({a32hi} << 16) | {lo16}; ] {{ {pc} }}")
     # Type 15a DM(data32, Ia) <-> ureg ; 15b DM(data7, Ia)
     for gg in (0, 1):
@@ -931,8 +940,8 @@ def instr_types():
                     pc = f"*[dm]:4 ({ir} + d32) = {ureg38};"
                 else:
                     dsp = f'{ureg38}^" = {sp}("^d32^", "^{ir}^")"{lws}'
-                    pc = f"{ureg38} = *[dm]:4 ({ir} + d32);"
-                out.append(f"instr: MOVE {dsp} is {f(47, 45)}=5 & {f(44, 44)}={gg} & {ir} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg38} & {a32hi} ; {lo16} "
+                    pc = f"{ureg38} = *[dm]:4 ({ir} + d32); {bi38} = {ureg38};"
+                out.append(f"instr: MOVE {dsp} is {f(47, 45)}=5 & {f(44, 44)}={gg} & {ir} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg38} & {bi38} & {a32hi} ; {lo16} "
                            f"[ d32 = ({a32hi} << 16) | {lo16}; ] {{ {pc} }}")
                 d7 = f(22, 16, signed=True)
                 if dd:
@@ -940,8 +949,8 @@ def instr_types():
                     pc = f"*[dm]:4 ({ir} + {d7}) = {ureg29};"
                 else:
                     dsp = f'{ureg29}^" = {sp}("^{d7}^", "^{ir}^")"{lws}'
-                    pc = f"{ureg29} = *[dm]:4 ({ir} + {d7});"
-                out.append(f"instr: MOVE {dsp} is visa=1 & {f(47, 44)}=0x9 & {f(36, 34)}=2 & {f(37, 37)}={gg} & {ir} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg29} & {d7} "
+                    pc = f"{ureg29} = *[dm]:4 ({ir} + {d7}); {bi29} = {ureg29};"
+                out.append(f"instr: MOVE {dsp} is visa=1 & {f(47, 44)}=0x9 & {f(36, 34)}=2 & {f(37, 37)}={gg} & {ir} & {f(40, 40)}={dd} & {f(39, 39)}={ll} & {ureg29} & {bi29} & {d7} "
                            f"{{ {pc} }}")
     # Type 16a DM(Ia, Mb) = data32 ; 16b data16
     for gg in (0, 1):
@@ -956,11 +965,11 @@ def instr_types():
         out.append(f'instr: MOVE "{sp}("^{ir}^", "^{mr}^") = "^{d16s} is visa=1 & {f(47, 44)}=0x9 & {f(36, 34)}=1 & {f(37, 37)}={gg} & {ir} & {mr} & {d16s} '
                    f'{{ local v:4 = {d16s}; *[dm]:4 {ir} = v; {ir} = {ir} + {mr}; }}')
     # Type 17 ureg = data32 / data16
-    out.append(f'instr: MOVE {ureg38}^" = "^d32 is {f(47, 40)}=0x0F & {f(39, 39)}=0 & {ureg38} & {a32hi} ; {lo16} '
-               f'[ d32 = ({a32hi} << 16) | {lo16}; ] {{ {ureg38} = d32; }}')
+    out.append(f'instr: MOVE {ureg38}^" = "^d32 is {f(47, 40)}=0x0F & {f(39, 39)}=0 & {ureg38} & {bi38} & {a32hi} ; {lo16} '
+               f'[ d32 = ({a32hi} << 16) | {lo16}; ] {{ {ureg38} = d32; {bi38} = d32; }}')
     d16s = f(31, 16, signed=True)
-    out.append(f'instr: MOVE {ureg38}^" = "^{d16s} is visa=1 & {f(47, 40)}=0x0F & {f(39, 39)}=1 & {ureg38} & {d16s} '
-               f'{{ {ureg38} = {d16s}; }}')
+    out.append(f'instr: MOVE {ureg38}^" = "^{d16s} is visa=1 & {f(47, 40)}=0x0F & {f(39, 39)}=1 & {ureg38} & {bi38} & {d16s} '
+               f'{{ {ureg38} = {d16s}; {bi38} = {d16s}; }}')
     # Type 18 BIT op sreg data32
     sreg = regs(35, 32, [n for n in UREG[112:128]])
     bops = {0: ("SET", "{r} = {r} | d32;"), 1: ("CLR", "{r} = {r} & ~d32;"), 2: ("TGL", "{r} = {r} ^ d32;"),

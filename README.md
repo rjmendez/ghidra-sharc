@@ -37,6 +37,11 @@ memory map.
   so unconditional code carries no dead branches.
 * **Flags.** The ALU sets AZ/AN, the multiplier MN (condition MS), the shifter
   SZ; BIT TST/XOR set BTF.  `NOT LCE` is `CURLCNTR != 1`.
+* **B registers.** Loading `Bn` also loads `In` with the same value
+  (Programming Reference, "Circular Buffering Mode"), for every ureg load:
+  register moves, memory loads and immediates.  A companion operand over the
+  ureg field names `In` for the B codes and the scratch register `BIX`, which
+  nothing reads, for all others.
 * **Arithmetic.** Fixed and floating ALU, integer multiply exact, fractional
   multiply as 1.31, shifts and immediate bit-field extract/deposit exact.
   CLIP, SCALB, MANT, LOGB, RECIPS, RSQRTS, COPYSIGN, register-count FEXT/FDEP,
@@ -110,6 +115,14 @@ points.  MULTI_PROC streams are not supported.
 * SIMD (PEy), circular buffering (`L`/`B` registers), bit-reversed
   addressing and long-word (`LW`) moves are not modelled: data address
   generators update linearly and moves are 32-bit.
+* Not modelled against the Programming Reference, found by executing single
+  instructions in the p-code emulator against an independent interpreter: AC,
+  AV, MV and SV are not set (conditions on them read whatever the register
+  holds); the multiplier half of a multifunction instruction does not set MS;
+  denormal float results are kept rather than flushed to zero; FIX/TRUNC of a
+  value outside the int32 range gives the p-code `trunc` result, not all 1s or
+  (ALUSAT) the saturated value.  None of these changes an instruction's
+  register data flow.
 * The status and PC stacks (`PUSH/POP STS`, `PCSTK`), cache control, IDLE and
   RTI's status restore are user operations.
 * Delay slots are correct only after the SHARC Delay Slot analyzer has run;

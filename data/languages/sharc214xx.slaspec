@@ -45,6 +45,9 @@ define register offset=0x210 size=4 [ MRF2 MRB2 ];
 define register offset=0x220 size=1 [ AZ AN AC AV MV MS SV SZ FLAG0 FLAG1 FLAG2 FLAG3 BTF BM ];
 # the loop-counter stack below CURLCNTR (six levels, PGR "Loop Counter Stack")
 define register offset=0x240 size=4 [ LCSTK0 LCSTK1 LCSTK2 LCSTK3 LCSTK4 LCSTK5 ];
+# Loading Bn also loads In; the ureg loads write their register and, through a companion
+# field, In for a B code or this scratch register for every other code (never read).
+define register offset=0x260 size=4 [ BIX ];
 
 define register offset=0x300 size=8 contextreg;
 define context contextreg
