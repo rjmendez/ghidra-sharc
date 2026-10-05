@@ -6,6 +6,7 @@ SMOKE sw:00124009 IDLE
 SMOKE sw:0012400c NOP  (no p-code)
 SMOKE sw:0012400f RTS 
 SMOKE analyzer SHARC Call Idiom
+SMOKE analyzer SHARC Code Sweep
 SMOKE analyzer SHARC Delay Slot
 SMOKE analyzer SHARC Function Pointer Arguments
 SMOKE analyzer SHARC Loop End

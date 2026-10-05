@@ -29,6 +29,7 @@ import ghidra.program.model.address.*;
 import ghidra.program.model.lang.*;
 import ghidra.program.model.listing.*;
 import ghidra.program.model.mem.*;
+import ghidra.program.model.symbol.SourceType;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.TaskMonitor;
 
@@ -57,12 +58,17 @@ import ghidra.util.task.TaskMonitor;
  * and compressed blocks (tag 0x2000, zlib), which are inflated and replayed in place.
  * A stream may continue after a FINAL_INIT (a kernel that reloads itself, then boots the
  * next part of the stream); all of it is replayed.  MULTI_PROC streams are not supported.
+ * <p>
+ * SHARC+ (ADSP-2156x / ADSP-SC5xx) streams are a different format: 16-byte block headers
+ * and global addresses, loaded into the SHARCPLUS language by {@code loadSc5}.
  */
 public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 
 	public static final String NAME = "ADI SHARC Boot Stream (LDR)";
 	private static final LanguageCompilerSpecPair LANGUAGE =
 		new LanguageCompilerSpecPair("SHARC:BE:32:214xx", "default");
+	private static final LanguageCompilerSpecPair LANGUAGE_PLUS =
+		new LanguageCompilerSpecPair("SHARC:BE:32:SHARCPLUS", "default");
 
 	/** The boot kernel: 256 48-bit instructions, INIT_L48-packed, loaded to the IVT. */
 	static final int KERNEL_BYTES = 256 * 6;
@@ -94,10 +100,35 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 			return List.of();
 		}
 		byte[] buf = provider.readBytes(0, provider.length());
-		if (findStart(buf) < 0) {
+		if (walkSc5(buf, null)) {
+			return List.of(new LoadSpec(this, 0, LANGUAGE_PLUS, true));
+		}
+		if (normalize(buf) == null) {
 			return List.of();
 		}
 		return List.of(new LoadSpec(this, 0, LANGUAGE, true));
+	}
+
+	/**
+	 * The stream with its 32-bit words least significant byte first, as the walker reads them:
+	 * {@code buf} if it already is a boot stream, a copy with every word's bytes swapped if it
+	 * is stored most significant byte first, else null.
+	 */
+	static byte[] normalize(byte[] buf) {
+		if (findStart(buf) >= 0) {
+			return buf;
+		}
+		if (buf.length % 4 != 0) {
+			return null;
+		}
+		byte[] sw = new byte[buf.length];
+		for (int i = 0; i < buf.length; i += 4) {
+			sw[i] = buf[i + 3];
+			sw[i + 1] = buf[i + 2];
+			sw[i + 2] = buf[i + 1];
+			sw[i + 3] = buf[i];
+		}
+		return findStart(sw) >= 0 ? sw : null;
 	}
 
 	/**
@@ -201,13 +232,21 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 		MessageLog log = settings.log();
 		TaskMonitor monitor = settings.monitor();
 		ByteProvider provider = settings.provider();
-		byte[] buf = provider.readBytes(0, provider.length());
-		int start = findStart(buf);
-		if (start < 0) {
+		byte[] raw = provider.readBytes(0, provider.length());
+		if (walkSc5(raw, null)) {
+			loadSc5(program, raw, settings);
+			return;
+		}
+		byte[] buf = normalize(raw);
+		if (buf == null) {
 			throw new IOException("not a SHARC boot stream");
 		}
-		Image image = new Image();
+		int start = findStart(buf);
+		Image image = new Image(false);
 		List<String> notes = new ArrayList<>();
+		if (buf != raw) {
+			notes.add("stream words were most significant byte first: byte-swapped");
+		}
 		if (start == KERNEL_BYTES) {
 			image.initL48(IVT, 256, Arrays.copyOf(buf, KERNEL_BYTES));
 			notes.add("boot kernel -> IVT 0x8c000");
@@ -221,6 +260,109 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 		}
 		catch (Exception e) {
 			throw new IOException("could not create the memory of " + provider.getName(), e);
+		}
+	}
+
+	// ------------------------------------------------------------------ SHARC+ (SC5xx) streams
+
+	/** SC5xx block header flags (the low 16 bits of the first header word). */
+	static final int SC5_FILL = 0x100, SC5_IGNORE = 0x1000, SC5_FIRST = 0x4000, SC5_FINAL = 0x8000;
+	/** Global window of the L1 blocks: short-word address = (G - SC5_L1) / 2.  Below it (L2 etc.) is kept as words. */
+	static final long SC5_L1 = 0x28000000L, SC5_L1_END = 0x30000000L;
+
+	/** One block of an SC5xx boot stream; {@code data} is null for a FILL or IGNORE block. */
+	record Sc5Block(int offset, int flags, long target, long count, long arg, byte[] data) {
+	}
+
+	/**
+	 * Whether {@code buf} is an SC5xx / ADSP-2156x boot stream: 16-byte little-endian block
+	 * headers (flags, target address, byte count, argument) whose bytes XOR to zero, each
+	 * followed by its payload unless it is a FILL or IGNORE block, ending with a FINAL block
+	 * exactly at the end of the file.  Blocks are added to {@code out} if given.
+	 */
+	static boolean walkSc5(byte[] buf, List<Sc5Block> out) {
+		int o = 0;
+		while (o + 16 <= buf.length) {
+			int x = 0;
+			for (int k = 0; k < 16; k++) {
+				x ^= buf[o + k];
+			}
+			long w0 = u32(buf, o), target = u32(buf, o + 4), count = u32(buf, o + 8);
+			long arg = u32(buf, o + 12);
+			int flags = (int) (w0 & 0xffff);
+			if ((x & 0xff) != 0 || (w0 >>> 24) != 0xad) {
+				return false;
+			}
+			boolean fill = (flags & SC5_FILL) != 0, ignore = (flags & SC5_IGNORE) != 0;
+			long size = fill || ignore ? 0 : count;
+			if (o + 16 + size > buf.length || (!fill && !ignore && count % 4 != 0)) {
+				return false;
+			}
+			if (out != null) {
+				out.add(new Sc5Block(o, flags, target, count, arg,
+					size == 0 ? null : Arrays.copyOfRange(buf, o + 16, (int) (o + 16 + size))));
+			}
+			o += 16 + (int) size;
+			if ((flags & SC5_FINAL) != 0) {
+				return o == buf.length;
+			}
+		}
+		return false;
+	}
+
+	private void loadSc5(Program program, byte[] buf, ImporterSettings settings)
+			throws CancelledException, IOException {
+		MessageLog log = settings.log();
+		TaskMonitor monitor = settings.monitor();
+		List<Sc5Block> blocks = new ArrayList<>();
+		walkSc5(buf, blocks);
+		Image image = new Image(true);
+		long entry = -1;
+		for (Sc5Block b : blocks) {
+			monitor.checkCancelled();
+			boolean ignore = (b.flags & SC5_IGNORE) != 0, fill = (b.flags & SC5_FILL) != 0;
+			log.appendMsg(NAME, String.format("%s%s at 0x%x: flags=0x%04x target=0x%08x bytes=0x%x arg=0x%08x",
+				(b.flags & SC5_FIRST) != 0 ? "FIRST " : "", ignore ? "IGNORE" : fill ? "FILL" : "DATA",
+				b.offset, b.flags, b.target, b.count, b.arg));
+			if (ignore) {
+				if ((b.flags & SC5_FIRST) != 0) {
+					entry = b.target;	// the application's start: a 48-bit ISA address
+				}
+				continue;
+			}
+			for (long k = 0; k < b.count; k += 2) {
+				int v;
+				if (b.data == null) {
+					v = (int) (b.arg >>> (8 * (int) (k & 2))) & 0xffff;
+				}
+				else {
+					v = (b.data[(int) k] & 0xff) | ((b.data[(int) k + 1] & 0xff) << 8);
+				}
+				long g = b.target + k;
+				if (g < SC5_L1) {
+					image.writeExt16(g, v);
+				}
+				else if (g < SC5_L1_END) {
+					image.write16((g - SC5_L1) / 2, v);
+				}
+				else {
+					throw new IOException(String.format("block address 0x%x is outside the SHARC+ memory map", g));
+				}
+			}
+		}
+		image.markIvt(log);
+		long entrySw = entry < 0 ? -1 : image.markEntry(entry, log);
+		try {
+			image.create(program, monitor, log);
+			if (entrySw >= 0) {
+				AddressSpace sw = program.getAddressFactory().getDefaultAddressSpace();
+				Address a = sw.getAddress(entrySw, true);
+				program.getSymbolTable().createLabel(a, "entry", SourceType.IMPORTED);
+				program.getSymbolTable().addExternalEntryPoint(a);
+			}
+		}
+		catch (Exception e) {
+			throw new IOException("could not create the memory of " + settings.provider().getName(), e);
 		}
 	}
 
@@ -323,42 +465,107 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 	}
 
 	/**
-	 * Internal memory of a 5-Mbit ADSP-214xx (ADSP-21467/21469, 21479, 21483-21489) as one
-	 * array of short words per SRAM block, indexed by short-word address.  Normal word n is
-	 * short words 2n (low half) and 2n+1; long word l is 4l..4l+3; 48-bit word a is the three
-	 * short words from 3a - (a &amp; 0xe0000), least significant first.  External memory is
-	 * kept as 32-bit words at normal-word addresses 0x200000 and up.
+	 * Internal memory of a 5-Mbit ADSP-214xx (ADSP-21467/21469, 21479, 21483-21489) or of a
+	 * SHARC+ as one array of short words per SRAM block, indexed by short-word address.  Normal
+	 * word n is short words 2n (low half) and 2n+1; long word l is 4l..4l+3; 48-bit word a is the
+	 * three short words from 3a - (a &amp; blockMask), least significant first.  External memory
+	 * is kept as 32-bit words at normal-word addresses 0x200000 and up (SC5xx streams: G / 4).
 	 */
 	static final class Image {
-		static final long[][] BLOCKS = { // short-word base, length
+		static final long[][] BLOCKS_214 = { // short-word base, length
 			{ 0x124000, 0x18000 }, { 0x164000, 0x18000 }, { 0x180000, 0x10000 },
 			{ 0x1c0000, 0x10000 } };
+		/**
+		 * SHARC+ L1: four blocks of up to 0x20000 short words at normal-word addresses
+		 * 0x90000, 0xb0000, 0xc0000 and 0xe0000 (SHARC+ Core Programming Reference ch. 7; the
+		 * global addresses 0x28240000, 0x282c0000, 0x28300000, 0x28380000 of the SC5xx streams).
+		 */
+		static final long[][] BLOCKS_PLUS = {
+			{ 0x120000, 0x20000 }, { 0x160000, 0x20000 }, { 0x180000, 0x20000 },
+			{ 0x1c0000, 0x20000 } };
 		static final long EXT = 0x200000;
+
+		final long[][] blocks;
+		final long blockMask;		// SW = 3*A - (A & blockMask) for a 48-bit address A
 
 		final short[][] shorts = new short[4][];
 		final BitSet[] defined = new BitSet[4];
 		final BitSet[] isaStart = new BitSet[4];	// first short of a 48-bit word
 		final TreeMap<Long, Long> ext = new TreeMap<>();
 
-		Image() {
+		Image(boolean plus) {
+			blocks = plus ? BLOCKS_PLUS : BLOCKS_214;
+			blockMask = plus ? 0xf0000 : 0xe0000;
 			for (int b = 0; b < 4; b++) {
-				shorts[b] = new short[(int) BLOCKS[b][1]];
+				shorts[b] = new short[(int) blocks[b][1]];
 				defined[b] = new BitSet();
 				isaStart[b] = new BitSet();
 			}
 		}
 
-		static int block(long sw) {
+		int block(long sw) {
 			for (int b = 0; b < 4; b++) {
-				if (sw >= BLOCKS[b][0] && sw < BLOCKS[b][0] + BLOCKS[b][1]) {
+				if (sw >= blocks[b][0] && sw < blocks[b][0] + blocks[b][1]) {
 					return b;
 				}
 			}
 			return -1;
 		}
 
-		static long sw48(long a) {
-			return 3 * a - (a & 0xe0000);
+		long sw48(long a) {
+			return 3 * a - (a & blockMask);
+		}
+
+		/** SC5xx streams: a 16-bit unit of L2 / external memory at global byte address {@code g}. */
+		void writeExt16(long g, int v) {
+			long n = g / 4;
+			long old = ext.getOrDefault(n, 0L);
+			int sh = (int) (g & 2) * 8;
+			ext.put(n, (old & ~(0xffffL << sh)) | ((long) (v & 0xffff) << sh));
+		}
+
+		/**
+		 * Marks the start-up routine at the 48-bit entry address {@code a} as ISA code (the core
+		 * leaves reset in ISA mode): from the entry to its first JUMP (opcode 0x06/0x07) and that
+		 * jump's two delay slots.  Returns the entry's short-word address, or -1 outside L1.
+		 */
+		long markEntry(long a, MessageLog log) {
+			long s = sw48(a);
+			int b = block(s);
+			if (b < 0) {
+				log.appendMsg(NAME, String.format("entry 0x%x is outside L1", a));
+				return -1;
+			}
+			int i = (int) (s - blocks[b][0]);
+			int n = 0;
+			for (; n < 64; n++) {
+				int k = i + 3 * n;
+				if (k + 2 >= shorts[b].length || !defined[b].get(k + 2)) {
+					break;
+				}
+				int top = (shorts[b][k + 2] >> 8) & 0xff;	// the most significant parcel is stored last
+				if (top == 0x06 || top == 0x07) {
+					n += 3;				// the jump and its delay slots
+					break;
+				}
+			}
+			for (int w = 0; w < n; w++) {
+				isaStart[b].set(i + 3 * w);
+			}
+			log.appendMsg(NAME, String.format("entry 0x%x = sw 0x%x: %d ISA words", a, s, n));
+			return s;
+		}
+
+		/** An L1 interrupt vector table (SYSCTL.IIVT = 1) fills the start of block 0 with 128 ISA words. */
+		void markIvt(MessageLog log) {
+			if (!defined[0].get(0) || !defined[0].get(0x17f)) {
+				return;
+			}
+			for (int w = 0; w < 0x80; w++) {
+				isaStart[0].set(3 * w);
+			}
+			log.appendMsg(NAME, String.format("interrupt vector table at sw 0x%x: 128 ISA words",
+				blocks[0][0]));
 		}
 
 		private void put(long sw, int value, boolean fromIsa) throws IOException {
@@ -366,7 +573,7 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 			if (b < 0) {
 				throw new IOException(String.format("address outside internal memory: sw 0x%x", sw));
 			}
-			int i = (int) (sw - BLOCKS[b][0]);
+			int i = (int) (sw - blocks[b][0]);
 			if (!fromIsa) {
 				for (int s = Math.max(0, i - 2); s <= i; s++) {	// a 48-bit word partly overwritten
 					if (isaStart[b].get(s)) {
@@ -397,7 +604,7 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 			put(s + 1, (int) ((v >>> 16) & 0xffff), true);
 			put(s + 2, (int) ((v >>> 32) & 0xffff), true);
 			int b = block(s);
-			int i = (int) (s - BLOCKS[b][0]);
+			int i = (int) (s - blocks[b][0]);
 			isaStart[b].set(i);
 			isaStart[b].clear(i + 1, i + 3);
 		}
@@ -443,7 +650,7 @@ public class SharcLdrLoader extends AbstractProgramWrapperLoader {
 					continue;
 				}
 				int lo = defined[b].nextSetBit(0), hi = defined[b].length() - 1;
-				long base = BLOCKS[b][0];
+				long base = blocks[b][0];
 				// short-word view: 48-bit words most significant parcel first
 				byte[] code = new byte[2 * (hi - lo + 1)];
 				List<long[]> isa = new ArrayList<>();

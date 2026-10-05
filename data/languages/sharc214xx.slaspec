@@ -5,7 +5,7 @@
 # Code space.  One code space, sw, whose addressable unit is a 16-bit short word: VISA
 # code sits at its short-word (SW) address.  48-bit ISA code is placed at the SW alias of
 # its 48-bit address -- the three short words that hold it in the same physical SRAM
-# column, SW = 3*A48 - (A48 & 0xe0000) (block 0: 0x8c000 -> 0x124000) -- with the most
+# column, SW = 3*A48 - (A48 & BLKMASK) (214xx block 0: 0x8c000 -> 0x124000) -- with the most
 # significant parcel first, so one program holds both kinds of code exactly as they
 # overlap in block 0.  The context bit `visa` selects the decoder (0 = ISA).
 #
@@ -22,6 +22,11 @@
 # which the context field `dslot` records (see DS below and the SHARC Delay Slot analyzer).
 #
 # The instruction tables are generated: see tools/gen_sinc.py.
+
+# BLKMASK in SW = 3*A - (A & BLKMASK): 0xe0000 here, 0xf0000 for SHARC+ (sharcplus.slaspec).
+@ifndef BLKMASK
+@define BLKMASK "0xe0000"
+@endif
 
 define endian=big;
 define alignment=2;
@@ -74,12 +79,12 @@ macro setsz(r)   { SZ = (r == 0); }
 
 # A computed code address.  In ISA code a code pointer is a 48-bit address; like the direct
 # targets (map48 in tools/gen_sinc.py) it is mapped to its short-word alias,
-# SW = 3*A - (A & 0xe0000) for A in 0x80000..0xfffff.  In VISA code pointers are short-word
+# SW = 3*A - (A & BLKMASK) for A in 0x80000..0xfffff.  In VISA code pointers are short-word
 # addresses already.  `isa` is the constant exported by ISA, so the decompiler folds the
 # expression away in VISA code.
 macro pmcode(t, isa) {
 	local s48:4 = isa * ((t >> 19) & 1) * (~(t >> 20) & 1);
-	t = t + s48 * (2 * t - (t & 0xe0000));
+	t = t + s48 * (2 * t - (t & $(BLKMASK)));
 }
 
 # DO pushes CURLCNTR onto the loop-counter stack; the end of the loop pops it.

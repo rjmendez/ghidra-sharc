@@ -1,0 +1,2 @@
+# The ldr case with every 32-bit word stored most significant byte first (loader must byte-swap).
+00000005 00000002 00090000 12345678 00000f00 0a3e0000 00000003 00000002 00138000 00010001

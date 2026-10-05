@@ -490,12 +490,12 @@ def map48(t):
 
     Short-word (SW) addresses 0x100000..0x1fffff are used as they are.  A 48-bit address
     in 0x80000..0xfffff (blocks 0-3) is replaced by its physical SW alias, where the
-    instruction's three parcels are stored: SW = 3*A - (A & 0xe0000) (block 0 0x8c000 ->
-    0x124000, block 1 0xac000 -> 0x164000, block 2 0xc0000 -> 0x180000, block 3 0xe0000 ->
+    instruction's three parcels are stored: SW = 3*A - (A & BLKMASK) (214xx: block 0 0x8c000
+    -> 0x124000, block 1 0xac000 -> 0x164000, block 2 0xc0000 -> 0x180000, block 3 0xe0000 ->
     0x1c0000).  There are no conditionals in pattern expressions, so the choice is made
     arithmetically with s48 = bit 19 and not bit 20."""
     s48 = f"((({t}) >> 19) & 1 & ~(({t}) >> 20))"
-    return f"({t}) + {s48} * (2 * ({t}) - (({t}) & 0xe0000))"
+    return f"({t}) + {s48} * (2 * ({t}) - (({t}) & $(BLKMASK)))"
 
 
 def targets():
@@ -571,7 +571,10 @@ def instr_types():
     bi_regs = [f"I{k - 64}" if 64 <= k < 80 else "BIX" for k in range(128)]
     bi29 = FL.regs(29, 23, bi_regs, kind="bi")
     bi38 = FL.regs(38, 32, bi_regs, kind="bi")
-    nocomp = f"{f(22, 16)}=0x3f"                    # VISA 32-bit form: compute field absent
+    # VISA 32-bit form: compute field absent.  Bits 22..18 = 01111 never occur in a compute field
+    # (CU = 11 is unused), so bits 17..16 are ignored: 11 in 214xx code, any value in SHARC+ code,
+    # where they carry the byte/short-word access modifiers (BHSE) of types 3b/4b.
+    nocomp = f"{f(22, 18)}=0x0f"
     cnt = [0]
 
     def mem(space_g, d, ir, mr, reg, post=True, lw=False, bi=None):
@@ -995,6 +998,11 @@ def instr_types():
                    f'[ d32s = ({a32hi} << 16) | {lo16}; ] {{ build {nm}; {nm} = {isr} + d32s; }}')
         out.append(f'instr: BITREV {nm}^"BITREV("^{isr}^", "^d32s^")" is ({f(47, 40)}=0x16 & {f(39, 39)}=1 & {f(38, 38)}={gg} & {isr} & {nm} & {a32hi} ; {lo16}) '
                    f'[ d32s = ({a32hi} << 16) | {lo16}; ] {{ build {nm}; local k:4 = d32s; {nm} = bitrev({isr}, k); }}')
+        # SHARC+ Type 19a with a size suffix: opcode 0x15, bit 39 selects (sw)/(nw).  The suffix
+        # is display only: like the forms above, the add is not scaled.
+        for w, suffix in ((0, "sw"), (1, "nw")):
+            out.append(f'instr: MODIFY {nm}^"MODIFY("^{isr}^", "^d32s^") ({suffix})" is ({f(47, 40)}=0x15 & {f(39, 39)}={w} & {f(38, 38)}={gg} & {isr} & {nm} & {a32hi} ; {lo16}) '
+                       f'[ d32s = ({a32hi} << 16) | {lo16}; ] {{ build {nm}; {nm} = {isr} + d32s; }}')
     # Type 20 push/pop.  PUSH/POP LOOP use the modelled loop-counter stack; the status and
     # PC stacks and the cache flush remain user operations.
     names20 = ["PUSH LOOP", "POP LOOP", "PUSH STS", "POP STS", "PUSH PCSTK", "POP PCSTK", "FLUSH CACHE"]

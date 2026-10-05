@@ -1,0 +1,24 @@
+SMOKE block blk0_sw sw:00120000-sw:0012017f.1 init rwx
+SMOKE block blk2_sw sw:00180000-sw:0018000b.1 init rwx
+SMOKE block blk3_sw sw:001c0000-sw:001c0005.1 init rwx
+SMOKE block iop dm:00000000-dm:0003ffff.3 uninit rw-
+SMOKE block blk0_nw dm:00090000-dm:000900bf.3 init rw-
+SMOKE block blk2_nw dm:000c0000-dm:000c0005.3 init rw-
+SMOKE block blk3_nw dm:000e0000-dm:000e0002.3 init rw-
+SMOKE sw:00120000 RTI 
+SMOKE sw:00120003 RTI 
+SMOKE sw:00120006 RTI 
+SMOKE sw:00120009 RTI 
+SMOKE sw:0012000c JUMP (0x001c0000)
+SMOKE sw:0012000f RTI 
+SMOKE sw:00180000 JUMP (0x001c0000)
+SMOKE sw:00180003 NOP  (no p-code)
+SMOKE sw:00180006 NOP  (no p-code)
+SMOKE sw:00180009 NOP  (no p-code)
+SMOKE sw:001c0000 MODIFY MODIFY(I7,0xfffffffb) (nw)
+SMOKE sw:001c0003 NOP  (no p-code)
+SMOKE analyzer SHARC Call Idiom
+SMOKE analyzer SHARC Code Sweep
+SMOKE analyzer SHARC Delay Slot
+SMOKE analyzer SHARC Function Pointer Arguments
+SMOKE analyzer SHARC Loop End

@@ -1,0 +1,4 @@
+# SHARC+ (ADSP-2156x, ADSP-SC5xx): the 214xx definition with SHARC+'s 48-bit block bases
+# (0x90000/0xb0000/0xc0000/0xe0000).  SHARC+-only instruction types are not modelled yet.
+@define BLKMASK "0xf0000"
+@include "sharc214xx.slaspec"

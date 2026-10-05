@@ -26,6 +26,7 @@ define token i32 (32)
   a21_20rym = (4,5)
   a22_16 = (0,6)
   a22_16s = (0,6) signed
+  a22_18 = (2,6)
   a22_22 = (6,6)
   a23_16 = (0,7)
   a23_16s = (0,7) signed
@@ -1915,27 +1916,27 @@ CMP2B: "MR1B = "^a27_24rn is a38_38=1 & a37_33mr=0 & a32_32=1 & a27_24rn & a31_2
 CMP2B: a27_24rn^" = MR2B" is a38_38=1 & a37_33mr=0 & a32_32=0 & a27_24rn & a31_28mrsel=6 { a27_24rn = MRB2; }
 CMP2B: "MR2B = "^a27_24rn is a38_38=1 & a37_33mr=0 & a32_32=1 & a27_24rn & a31_28mrsel=6 { MRB2 = a27_24rn; }
 
-ABS24: tgt is a23_16 ; b15_0 [ tgt = (((a23_16 << 16) | b15_0)) + (((((a23_16 << 16) | b15_0)) >> 19) & 1 & ~((((a23_16 << 16) | b15_0)) >> 20)) * (2 * (((a23_16 << 16) | b15_0)) - ((((a23_16 << 16) | b15_0)) & 0xe0000)); ] { export *:4 tgt; }
-REL24: tgt is visa=1 & a23_16s ; b15_0 [ tgt = ((inst_start + ((a23_16s << 16) | b15_0))) + ((((inst_start + ((a23_16s << 16) | b15_0))) >> 19) & 1 & ~(((inst_start + ((a23_16s << 16) | b15_0))) >> 20)) * (2 * ((inst_start + ((a23_16s << 16) | b15_0))) - (((inst_start + ((a23_16s << 16) | b15_0))) & 0xe0000)); ] { export *:4 tgt; }
+ABS24: tgt is a23_16 ; b15_0 [ tgt = (((a23_16 << 16) | b15_0)) + (((((a23_16 << 16) | b15_0)) >> 19) & 1 & ~((((a23_16 << 16) | b15_0)) >> 20)) * (2 * (((a23_16 << 16) | b15_0)) - ((((a23_16 << 16) | b15_0)) & $(BLKMASK))); ] { export *:4 tgt; }
+REL24: tgt is visa=1 & a23_16s ; b15_0 [ tgt = ((inst_start + ((a23_16s << 16) | b15_0))) + ((((inst_start + ((a23_16s << 16) | b15_0))) >> 19) & 1 & ~(((inst_start + ((a23_16s << 16) | b15_0))) >> 20)) * (2 * ((inst_start + ((a23_16s << 16) | b15_0))) - (((inst_start + ((a23_16s << 16) | b15_0))) & $(BLKMASK))); ] { export *:4 tgt; }
 REL24: tgt is visa=0 & a23_16s ; b15_0 [ tgt = inst_start + ((a23_16s << 16) | b15_0) * 3; ] { export *:4 tgt; }
 REL6: tgt is visa=1 & a32_27s [ tgt = inst_start + a32_27s; ] { export *:4 tgt; }
 REL6: tgt is visa=0 & a32_27s [ tgt = inst_start + a32_27s * 3; ] { export *:4 tgt; }
 
 instr: "PAR" CMP48s^a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is (a47_45=1 & a44_44=0 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23) ... & CMP48s {   build CMP48s; local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
 
-instr: "PAR" a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is visa=1 & a47_45=1 & a44_44=0 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_16=0x3f {   local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
+instr: "PAR" a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is visa=1 & a47_45=1 & a44_44=0 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_18=0x0f {   local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
 
 instr: "PAR" CMP48s^a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is (a47_45=1 & a44_44=0 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23) ... & CMP48s {  local sv0:4 = a26_23; build CMP48s; local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
 
-instr: "PAR" a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is visa=1 & a47_45=1 & a44_44=0 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_16=0x3f {  local sv0:4 = a26_23; local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
+instr: "PAR" a36_33^" = DM("^a43_41^", "^a40_38^")"^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is visa=1 & a47_45=1 & a44_44=0 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_18=0x0f {  local sv0:4 = a26_23; local lv1:4 = *[dm]:4 a43_41; a43_41 = a43_41 + a40_38; a36_33 = lv1; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
 
 instr: "PAR" CMP48s^"DM("^a43_41^", "^a40_38^") = "^a36_33^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is (a47_45=1 & a44_44=1 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23) ... & CMP48s { local sv1:4 = a36_33;  build CMP48s; *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
 
-instr: "PAR" "DM("^a43_41^", "^a40_38^") = "^a36_33^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is visa=1 & a47_45=1 & a44_44=1 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_16=0x3f { local sv1:4 = a36_33;  *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
+instr: "PAR" "DM("^a43_41^", "^a40_38^") = "^a36_33^", "^a26_23^" = PM("^a32_30^", "^a29_27^")" is visa=1 & a47_45=1 & a44_44=1 & a37_37=0 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_18=0x0f { local sv1:4 = a36_33;  *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; local lv0:4 = *[dm]:4 a32_30; a32_30 = a32_30 + a29_27; a26_23 = lv0; }
 
 instr: "PAR" CMP48s^"DM("^a43_41^", "^a40_38^") = "^a36_33^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is (a47_45=1 & a44_44=1 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23) ... & CMP48s { local sv1:4 = a36_33; local sv0:4 = a26_23; build CMP48s; *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
 
-instr: "PAR" "DM("^a43_41^", "^a40_38^") = "^a36_33^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is visa=1 & a47_45=1 & a44_44=1 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_16=0x3f { local sv1:4 = a36_33; local sv0:4 = a26_23; *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
+instr: "PAR" "DM("^a43_41^", "^a40_38^") = "^a36_33^", "^"PM("^a32_30^", "^a29_27^") = "^a26_23 is visa=1 & a47_45=1 & a44_44=1 & a37_37=1 & a43_41 & a40_38 & a36_33 & a32_30 & a29_27 & a26_23 & a22_18=0x0f { local sv1:4 = a36_33; local sv0:4 = a26_23; *[dm]:4 a43_41 = sv1; a43_41 = a43_41 + a40_38; *[dm]:4 a32_30 = sv0; a32_30 = a32_30 + a29_27; }
 
 instr: "COMP" CCN^CMP48 is (a47_40=0x01 & a39_39=0 & CCN) ... & CMP48 { build CCN; if (!CCN) goto <skip>; build CMP48; <skip> }
 instr: "COMP" CMP48 is (a47_40=0x01 & a39_39=0 & a37_33=31) ... & CMP48 { build CMP48; }
@@ -1977,98 +1978,98 @@ instr: "SCOMP" s39_36N^" = "^s39_36bN^" * "^s35_32N is visa=1 & s47_44=0xc & s43
 instr: "MOVE" CCN^CMP48s^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; }
 
-instr: "MOVE" CCN^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; <skip> }
-instr: "MOVE" a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; }
+instr: "MOVE" CCN^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; <skip> }
+instr: "MOVE" a29_23^" = DM("^a40_38g0^", "^a43_41g0^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv1; a29_23bi = lv1; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; }
 
-instr: "MOVE" CCN^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; <skip> }
-instr: "MOVE" a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; }
+instr: "MOVE" CCN^a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; <skip> }
+instr: "MOVE" a29_23^" = DM("^a40_38g0^", "^a43_41g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv0:4 = *[dm]:4 (a43_41g0 + a40_38g0); a29_23 = lv0; a29_23bi = lv0; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; <skip> }
 instr: "MOVE" CMP48s^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31) ... & CMP48s { local sv1:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; }
 
-instr: "MOVE" CCN^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; <skip> }
-instr: "MOVE" "DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_16=0x3f { local sv1:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; }
+instr: "MOVE" CCN^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; <skip> }
+instr: "MOVE" "DM("^a40_38g0^", "^a43_41g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_18=0x0f { local sv1:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv1; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; <skip> }
 instr: "MOVE" CMP48s^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31) ... & CMP48s { local sv0:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; }
 
-instr: "MOVE" CCN^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; <skip> }
-instr: "MOVE" "DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_16=0x3f { local sv0:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; }
+instr: "MOVE" CCN^"DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; <skip> }
+instr: "MOVE" "DM("^a40_38g0^", "^a43_41g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_18=0x0f { local sv0:4 = a29_23; *[dm]:4 (a43_41g0 + a40_38g0) = sv0; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; }
 
-instr: "MOVE" CCN^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; <skip> }
-instr: "MOVE" a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; }
+instr: "MOVE" CCN^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; <skip> }
+instr: "MOVE" a29_23^" = DM("^a43_41g0^", "^a40_38g0^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv1; a29_23bi = lv1; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; }
 
-instr: "MOVE" CCN^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; <skip> }
-instr: "MOVE" a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; }
+instr: "MOVE" CCN^a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; <skip> }
+instr: "MOVE" a29_23^" = DM("^a43_41g0^", "^a40_38g0^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=0 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv0:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a40_38g0; a29_23 = lv0; a29_23bi = lv0; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; build CMP48s; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
 instr: "MOVE" CMP48s^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31) ... & CMP48s { local sv1:4 = a29_23; build CMP48s; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; }
 
-instr: "MOVE" CCN^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
-instr: "MOVE" "DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_16=0x3f { local sv1:4 = a29_23; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; }
+instr: "MOVE" CCN^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
+instr: "MOVE" "DM("^a43_41g0^", "^a40_38g0^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=0 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_18=0x0f { local sv1:4 = a29_23; *[dm]:4 a43_41g0 = sv1; a43_41g0 = a43_41g0 + a40_38g0; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; build CMP48s; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
 instr: "MOVE" CMP48s^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31) ... & CMP48s { local sv0:4 = a29_23; build CMP48s; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; }
 
-instr: "MOVE" CCN^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
-instr: "MOVE" "DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_16=0x3f { local sv0:4 = a29_23; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; }
+instr: "MOVE" CCN^"DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; <skip> }
+instr: "MOVE" "DM("^a43_41g0^", "^a40_38g0^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=0 & a31_31=1 & a30_30=1 & a43_41g0 & a40_38g0 & a29_23 & a37_33=31 & a22_18=0x0f { local sv0:4 = a29_23; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a40_38g0; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; }
 
-instr: "MOVE" CCN^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; <skip> }
-instr: "MOVE" a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; }
+instr: "MOVE" CCN^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; <skip> }
+instr: "MOVE" a29_23^" = PM("^a40_38g1^", "^a43_41g1^")" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv1; a29_23bi = lv1; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; }
 
-instr: "MOVE" CCN^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; <skip> }
-instr: "MOVE" a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; }
+instr: "MOVE" CCN^a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; <skip> }
+instr: "MOVE" a29_23^" = PM("^a40_38g1^", "^a43_41g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv0:4 = *[dm]:4 (a43_41g1 + a40_38g1); a29_23 = lv0; a29_23bi = lv0; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; <skip> }
 instr: "MOVE" CMP48s^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31) ... & CMP48s { local sv1:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; }
 
-instr: "MOVE" CCN^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; <skip> }
-instr: "MOVE" "PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_16=0x3f { local sv1:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; }
+instr: "MOVE" CCN^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; <skip> }
+instr: "MOVE" "PM("^a40_38g1^", "^a43_41g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_18=0x0f { local sv1:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv1; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; <skip> }
 instr: "MOVE" CMP48s^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31) ... & CMP48s { local sv0:4 = a29_23; build CMP48s; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; }
 
-instr: "MOVE" CCN^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; <skip> }
-instr: "MOVE" "PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_16=0x3f { local sv0:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; }
+instr: "MOVE" CCN^"PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; <skip> }
+instr: "MOVE" "PM("^a40_38g1^", "^a43_41g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=0 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_18=0x0f { local sv0:4 = a29_23; *[dm]:4 (a43_41g1 + a40_38g1) = sv0; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; }
 
-instr: "MOVE" CCN^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; <skip> }
-instr: "MOVE" a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; }
+instr: "MOVE" CCN^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; <skip> }
+instr: "MOVE" a29_23^" = PM("^a43_41g1^", "^a40_38g1^")" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv1; a29_23bi = lv1; }
 
 instr: "MOVE" CCN^CMP48s^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; <skip> }
 instr: "MOVE" CMP48s^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31) ... & CMP48s { build CMP48s; local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; }
 
-instr: "MOVE" CCN^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; <skip> }
-instr: "MOVE" a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_16=0x3f { local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; }
+instr: "MOVE" CCN^a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; <skip> }
+instr: "MOVE" a29_23^" = PM("^a43_41g1^", "^a40_38g1^")"^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=0 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a29_23bi & a37_33=31 & a22_18=0x0f { local lv0:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a40_38g1; a29_23 = lv0; a29_23bi = lv0; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; build CMP48s; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
 instr: "MOVE" CMP48s^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31) ... & CMP48s { local sv1:4 = a29_23; build CMP48s; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; }
 
-instr: "MOVE" CCN^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
-instr: "MOVE" "PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_16=0x3f { local sv1:4 = a29_23; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; }
+instr: "MOVE" CCN^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv1:4 = a29_23; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
+instr: "MOVE" "PM("^a43_41g1^", "^a40_38g1^") = "^a29_23 is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=0 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_18=0x0f { local sv1:4 = a29_23; *[dm]:4 a43_41g1 = sv1; a43_41g1 = a43_41g1 + a40_38g1; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; build CMP48s; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
 instr: "MOVE" CMP48s^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is (a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31) ... & CMP48s { local sv0:4 = a29_23; build CMP48s; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; }
 
-instr: "MOVE" CCN^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
-instr: "MOVE" "PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_16=0x3f { local sv0:4 = a29_23; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; }
+instr: "MOVE" CCN^"PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a29_23; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; <skip> }
+instr: "MOVE" "PM("^a43_41g1^", "^a40_38g1^") = "^a29_23^" (LW)" is visa=1 & a47_45=2 & a44_44=1 & a32_32=1 & a31_31=1 & a30_30=1 & a43_41g1 & a40_38g1 & a29_23 & a37_33=31 & a22_18=0x0f { local sv0:4 = a29_23; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a40_38g1; }
 
 instr: "MOVE" s35_32c^" = DM("^s43_41^", "^s40_38^")" is visa=1 & s47_44=0x9 & s36_36=1 & s37_37=0 & s43_41 & s40_38 & s35_32c {  local lv1:4 = *[dm]:4 s43_41; s43_41 = s43_41 + s40_38; s35_32c = lv1; }
 
@@ -2077,50 +2078,50 @@ instr: "MOVE" "DM("^s43_41^", "^s40_38^") = "^s35_32c is visa=1 & s47_44=0x9 & s
 instr: "MOVE" CCN^CMP48s^a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is (a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; <skip> }
 instr: "MOVE" CMP48s^a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is (a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; }
 
-instr: "MOVE" CCN^a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; <skip> }
-instr: "MOVE" a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; }
+instr: "MOVE" CCN^a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; <skip> }
+instr: "MOVE" a26_23t4^" = DM("^a32_27s^", "^a43_41g0^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 (a43_41g0 + a32_27s); a26_23t4 = lv1; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is (a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 (a43_41g0 + a32_27s) = sv0; <skip> }
 instr: "MOVE" CMP48s^"DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is (a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 (a43_41g0 + a32_27s) = sv0; }
 
-instr: "MOVE" CCN^"DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 (a43_41g0 + a32_27s) = sv0; <skip> }
-instr: "MOVE" "DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local sv0:4 = a26_23t4; *[dm]:4 (a43_41g0 + a32_27s) = sv0; }
+instr: "MOVE" CCN^"DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 (a43_41g0 + a32_27s) = sv0; <skip> }
+instr: "MOVE" "DM("^a32_27s^", "^a43_41g0^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=0 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local sv0:4 = a26_23t4; *[dm]:4 (a43_41g0 + a32_27s) = sv0; }
 
 instr: "MOVE" CCN^CMP48s^a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is (a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; <skip> }
 instr: "MOVE" CMP48s^a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is (a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; }
 
-instr: "MOVE" CCN^a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; <skip> }
-instr: "MOVE" a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; }
+instr: "MOVE" CCN^a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; <skip> }
+instr: "MOVE" a26_23t4^" = DM("^a43_41g0^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=0 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 a43_41g0; a43_41g0 = a43_41g0 + a32_27s; a26_23t4 = lv1; }
 
 instr: "MOVE" CCN^CMP48s^"DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is (a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; <skip> }
 instr: "MOVE" CMP48s^"DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is (a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; }
 
-instr: "MOVE" CCN^"DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; <skip> }
-instr: "MOVE" "DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local sv0:4 = a26_23t4; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; }
+instr: "MOVE" CCN^"DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; <skip> }
+instr: "MOVE" "DM("^a43_41g0^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=0 & a39_39=1 & a38_38=1 & a43_41g0 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local sv0:4 = a26_23t4; *[dm]:4 a43_41g0 = sv0; a43_41g0 = a43_41g0 + a32_27s; }
 
 instr: "MOVE" CCN^CMP48s^a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is (a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; <skip> }
 instr: "MOVE" CMP48s^a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is (a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; }
 
-instr: "MOVE" CCN^a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; <skip> }
-instr: "MOVE" a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; }
+instr: "MOVE" CCN^a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; <skip> }
+instr: "MOVE" a26_23t4^" = PM("^a32_27s^", "^a43_41g1^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 (a43_41g1 + a32_27s); a26_23t4 = lv1; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is (a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 (a43_41g1 + a32_27s) = sv0; <skip> }
 instr: "MOVE" CMP48s^"PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is (a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 (a43_41g1 + a32_27s) = sv0; }
 
-instr: "MOVE" CCN^"PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 (a43_41g1 + a32_27s) = sv0; <skip> }
-instr: "MOVE" "PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local sv0:4 = a26_23t4; *[dm]:4 (a43_41g1 + a32_27s) = sv0; }
+instr: "MOVE" CCN^"PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 (a43_41g1 + a32_27s) = sv0; <skip> }
+instr: "MOVE" "PM("^a32_27s^", "^a43_41g1^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=0 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local sv0:4 = a26_23t4; *[dm]:4 (a43_41g1 + a32_27s) = sv0; }
 
 instr: "MOVE" CCN^CMP48s^a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is (a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; <skip> }
 instr: "MOVE" CMP48s^a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is (a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { build CMP48s; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; }
 
-instr: "MOVE" CCN^a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; <skip> }
-instr: "MOVE" a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; }
+instr: "MOVE" CCN^a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; <skip> }
+instr: "MOVE" a26_23t4^" = PM("^a43_41g1^", "^a32_27s^")" is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=0 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local lv1:4 = *[dm]:4 a43_41g1; a43_41g1 = a43_41g1 + a32_27s; a26_23t4 = lv1; }
 
 instr: "MOVE" CCN^CMP48s^"PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is (a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; <skip> }
 instr: "MOVE" CMP48s^"PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is (a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31) ... & CMP48s { local sv0:4 = a26_23t4; build CMP48s; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; }
 
-instr: "MOVE" CCN^"PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; <skip> }
-instr: "MOVE" "PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_16=0x3f { local sv0:4 = a26_23t4; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; }
+instr: "MOVE" CCN^"PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local sv0:4 = a26_23t4; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; <skip> }
+instr: "MOVE" "PM("^a43_41g1^", "^a32_27s^") = "^a26_23t4 is visa=1 & a47_44=0x6 & a40_40=1 & a39_39=1 & a38_38=1 & a43_41g1 & a32_27s & a26_23t4 & a37_33=31 & a22_18=0x0f { local sv0:4 = a26_23t4; *[dm]:4 a43_41g1 = sv0; a43_41g1 = a43_41g1 + a32_27s; }
 
 SRCU: "R0" is a42_38=0 & a32_31=0 { export R0; }
 SRCU: "R1" is a42_38=0 & a32_31=1 { export R1; }
@@ -2254,14 +2255,14 @@ SRCU: "USTAT4" is a42_38=31 & a32_31=3 { export USTAT4; }
 instr: "MOVE" CCN^CMP48s^a29_23d^" = "^SRCU is (a47_43=0xE & a29_23d & a29_23bi & SRCU & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local t5:4 = SRCU; build CMP48s; a29_23d = t5; a29_23bi = t5; <skip> }
 instr: "MOVE" CMP48s^a29_23d^" = "^SRCU is (a47_43=0xE & a29_23d & a29_23bi & SRCU & a37_33=31) ... & CMP48s { local t5:4 = SRCU; build CMP48s; a29_23d = t5; a29_23bi = t5; }
 
-instr: "MOVE" CCN^a29_23d^" = "^SRCU is visa=1 & a47_43=0xE & a29_23d & a29_23bi & SRCU & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local t5:4 = SRCU; a29_23d = t5; a29_23bi = t5; <skip> }
-instr: "MOVE" a29_23d^" = "^SRCU is visa=1 & a47_43=0xE & a29_23d & a29_23bi & SRCU & a37_33=31 & a22_16=0x3f { local t5:4 = SRCU; a29_23d = t5; a29_23bi = t5; }
+instr: "MOVE" CCN^a29_23d^" = "^SRCU is visa=1 & a47_43=0xE & a29_23d & a29_23bi & SRCU & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local t5:4 = SRCU; a29_23d = t5; a29_23bi = t5; <skip> }
+instr: "MOVE" a29_23d^" = "^SRCU is visa=1 & a47_43=0xE & a29_23d & a29_23bi & SRCU & a37_33=31 & a22_18=0x0f { local t5:4 = SRCU; a29_23d = t5; a29_23bi = t5; }
 
 instr: "SWAP" CCN^CMP48s^a26_23sw^" <-> "^a41_38 is (a47_43=0xF & a41_38 & a26_23sw & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; local ts:4 = a26_23sw; local tc:4 = a41_38; build CMP48s; a26_23sw = tc; a41_38 = ts; <skip> }
 instr: "SWAP" CMP48s^a26_23sw^" <-> "^a41_38 is (a47_43=0xF & a41_38 & a26_23sw & a37_33=31) ... & CMP48s { local ts:4 = a26_23sw; local tc:4 = a41_38; build CMP48s; a26_23sw = tc; a41_38 = ts; }
 
-instr: "SWAP" CCN^a26_23sw^" <-> "^a41_38 is visa=1 & a47_43=0xF & a41_38 & a26_23sw & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; local ts:4 = a26_23sw; local tc:4 = a41_38; a26_23sw = tc; a41_38 = ts; <skip> }
-instr: "SWAP" a26_23sw^" <-> "^a41_38 is visa=1 & a47_43=0xF & a41_38 & a26_23sw & a37_33=31 & a22_16=0x3f { local ts:4 = a26_23sw; local tc:4 = a41_38; a26_23sw = tc; a41_38 = ts; }
+instr: "SWAP" CCN^a26_23sw^" <-> "^a41_38 is visa=1 & a47_43=0xF & a41_38 & a26_23sw & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; local ts:4 = a26_23sw; local tc:4 = a41_38; a26_23sw = tc; a41_38 = ts; <skip> }
+instr: "SWAP" a26_23sw^" <-> "^a41_38 is visa=1 & a47_43=0xF & a41_38 & a26_23sw & a37_33=31 & a22_18=0x0f { local ts:4 = a26_23sw; local tc:4 = a41_38; a26_23sw = tc; a41_38 = ts; }
 
 SHIMM: b7_4sh^" = LSHIFT "^b3_0sh^" BY "^b15_8s is a22_22=0 & a21_16=0x0 & a30_27 ; b15_8s & b3_0sh & b7_4sh & b15_15=0  { b7_4sh = b3_0sh << b15_8s; setsz(b7_4sh); }
 SHIMM: b7_4sh^" = LSHIFT "^b3_0sh^" BY "^b15_8s is a22_22=0 & a21_16=0x0 & a30_27 ; b15_8s & b3_0sh & b7_4sh & b15_15=1  { b7_4sh = b3_0sh >> -b15_8s; setsz(b7_4sh); }
@@ -2377,8 +2378,8 @@ IDST0: "I0 = " is a32_30=7 & a26_24=7 { export I0; }
 instr: "MODIFY" CCN^CMP48s^IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is (a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; build IDST0; IDST0 = a32_30s0 + a29_27s0; <skip> }
 instr: "MODIFY" CMP48s^IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is (a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & a37_33=31) ... & CMP48s { build CMP48s; build IDST0; IDST0 = a32_30s0 + a29_27s0; }
 
-instr: "MODIFY" CCN^IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is visa=1 & a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; build IDST0; IDST0 = a32_30s0 + a29_27s0; <skip> }
-instr: "MODIFY" IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is visa=1 & a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & a37_33=31 & a22_16=0x3f { build IDST0; IDST0 = a32_30s0 + a29_27s0; }
+instr: "MODIFY" CCN^IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is visa=1 & a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; build IDST0; IDST0 = a32_30s0 + a29_27s0; <skip> }
+instr: "MODIFY" IDST0^"MODIFY("^a32_30s0^", "^a29_27s0^")" is visa=1 & a47_40=0x04 & a38_38=0 & a32_30s0 & a29_27s0 & IDST0 & a37_33=31 & a22_18=0x0f { build IDST0; IDST0 = a32_30s0 + a29_27s0; }
 
 IDST1: is a32_30=0 & a26_24=0 { export I8; }
 IDST1: "I9 = " is a32_30=0 & a26_24=1 { export I9; }
@@ -2448,8 +2449,8 @@ IDST1: "I8 = " is a32_30=7 & a26_24=7 { export I8; }
 instr: "MODIFY" CCN^CMP48s^IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is (a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & CCN) ... & CMP48s { build CCN; if (!CCN) goto <skip>; build CMP48s; build IDST1; IDST1 = a32_30s1 + a29_27s1; <skip> }
 instr: "MODIFY" CMP48s^IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is (a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & a37_33=31) ... & CMP48s { build CMP48s; build IDST1; IDST1 = a32_30s1 + a29_27s1; }
 
-instr: "MODIFY" CCN^IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is visa=1 & a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & CCN & a22_16=0x3f { build CCN; if (!CCN) goto <skip>; build IDST1; IDST1 = a32_30s1 + a29_27s1; <skip> }
-instr: "MODIFY" IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is visa=1 & a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & a37_33=31 & a22_16=0x3f { build IDST1; IDST1 = a32_30s1 + a29_27s1; }
+instr: "MODIFY" CCN^IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is visa=1 & a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & CCN & a22_18=0x0f { build CCN; if (!CCN) goto <skip>; build IDST1; IDST1 = a32_30s1 + a29_27s1; <skip> }
+instr: "MODIFY" IDST1^"MODIFY("^a32_30s1^", "^a29_27s1^")" is visa=1 & a47_40=0x04 & a38_38=1 & a32_30s1 & a29_27s1 & IDST1 & a37_33=31 & a22_18=0x0f { build IDST1; IDST1 = a32_30s1 + a29_27s1; }
 
 instr: "JUMP" CCN^"("^ABS24^")" is (a47_41=3 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN) ... & ABS24 { build CCN; local c:1 = CCN; if (c) goto ABS24; }
 
@@ -2583,397 +2584,397 @@ instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^CMP48p is (a47_41=4 & a40_40=
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; popLoop(); goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; popLoop(); goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  popLoop(); goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); popLoop(); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); popLoop(); goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; popLoop(); goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; popLoop(); goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  popLoop(); goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); popLoop(); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); popLoop(); goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; return [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; return [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; return [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; return [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; return [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; return [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; return [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a32_30ind=4 & a29_27ind=6 & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; return [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; popLoop(); goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; popLoop(); goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; popLoop(); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; popLoop(); goto [tg]; }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
-instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
+instr: "JUMP" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; popLoop(); goto [tg]; <end> }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; popLoop(); goto [tg]; }
 
 instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; popLoop(); goto [tg]; }
 
-instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; popLoop(); goto [tg]; }
+instr: "JUMP" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; popLoop(); goto [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call [tg]; <end> }
 
-instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
+instr: "CALL" CCN^"("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; if (!c) goto <end>; call [tg]; <end> }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0) ... & CMP48p {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build CMP48p; build DS; call [tg]; }
 
 instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=1) ... & CMP48e {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA);  build DS; call [tg]; }
 
-instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_16=0x3f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
+instr: "CALL" "("^a29_27ind^", "^a32_30ind^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=0 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & a32_30ind & a29_27ind & ISA & DS & a25_25=0 & a22_18=0x0f {  local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); build DS; call [tg]; }
 
 instr: "JUMP" CCN^"("^REL6^")"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (c) goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (c) goto REL6; }
 
-instr: "JUMP" CCN^"("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (c) goto REL6; }
+instr: "JUMP" CCN^"("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (c) goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    goto REL6; }
 
-instr: "JUMP" "("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   goto REL6; }
+instr: "JUMP" "("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (c) goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (c) goto REL6; }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (c) goto REL6; }
+instr: "JUMP" CCN^"("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (c) goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; popLoop(); goto REL6; <end> }
+instr: "JUMP" CCN^"("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" "("^REL6^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; popLoop(); goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    popLoop(); goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   popLoop(); goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   popLoop(); goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; popLoop(); goto REL6; <end> }
+instr: "JUMP" CCN^"("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" "("^REL6^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; popLoop(); goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    popLoop(); goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   popLoop(); goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   popLoop(); goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (c) goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (c) goto REL6; }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (c) goto REL6; }
+instr: "JUMP" CCN^"("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (c) goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (c) goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (c) goto REL6; }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (c) goto REL6; }
+instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (c) goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
+instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; popLoop(); goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; popLoop(); goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; popLoop(); goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; popLoop(); goto REL6; }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
-instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
+instr: "JUMP" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; popLoop(); goto REL6; <end> }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; popLoop(); goto REL6; }
 
 instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; popLoop(); goto REL6; }
 
-instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; popLoop(); goto REL6; }
+instr: "JUMP" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=0 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; popLoop(); goto REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; call REL6; }
 
 instr: "CALL" "("^REL6^")"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    call REL6; }
 
-instr: "CALL" "("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   call REL6; }
+instr: "CALL" "("^REL6^")" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   call REL6; }
+instr: "CALL" "("^REL6^")"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   call REL6; }
+instr: "CALL" "("^REL6^")"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=0 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & CCN & REL6 & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0) ... & CMP48p {   build CMP48p; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=1) ... & CMP48e {    call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_16=0x3f {   call REL6; }
+instr: "CALL" "("^REL6^")"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=0 & a24_24=1 & a37_33=31 & REL6 & a25_25=0 & a22_18=0x0f {   call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; call REL6; }
+instr: "CALL" "("^REL6^")"^" (DB)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; call REL6; }
+instr: "CALL" "("^REL6^")"^" (DB)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=0 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; call REL6; }
+instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=0 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; call REL6; }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0) ... & CMP48p { build CCN; local c:1 = CCN;  if (!c) goto <nc>; build CMP48p; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=1) ... & CMP48e { build CCN; local c:1 = CCN;  if (c) goto <nc>; build CMP48e; <nc> build DS; if (!c) goto <end>; call REL6; <end> }
 
-instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_16=0x3f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
+instr: "CALL" CCN^"("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & CCN & REL6 & DS & a25_25=0 & a22_18=0x0f { build CCN; local c:1 = CCN;  build DS; if (!c) goto <end>; call REL6; <end> }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48p is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0) ... & CMP48p {   build CMP48p; build DS; call REL6; }
 
 instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)"^CMP48e is (a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=1) ... & CMP48e {    build DS; call REL6; }
 
-instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_16=0x3f {   build DS; call REL6; }
+instr: "CALL" "("^REL6^")"^" (DB)"^" (LA)"^" (CI)" is visa=1 & a47_41=4 & a40_40=1 & a39_39=1 & a38_38=1 & a26_26=1 & a24_24=1 & a37_33=31 & REL6 & DS & a25_25=0 & a22_18=0x0f {   build DS; call REL6; }
 
 instr: "JUMP" CC^"("^a29_27ind^", "^a32_30ind^")"^", ELSE "^CMP48s^"DM("^a43_41t10^", "^a40_38t10^") = "^a26_23t10 is (visa=0 & a47_45=6 & a44_44=0 & a43_41t10 & a40_38t10 & a26_23t10 & CC & a32_30ind & a29_27ind & ISA) ... & CMP48s { build CC; local c:1 = CC; local tg:4 = a32_30ind + a29_27ind; pmcode(tg, ISA); if (!c) goto <nt>; goto [tg]; <nt> local sv1:4 = a26_23t10; build CMP48s; *[dm]:4 a43_41t10 = sv1; a43_41t10 = a43_41t10 + a40_38t10; }
 
@@ -3228,6 +3229,10 @@ instr: "MODIFY" IDST19_0^"MODIFY("^a34_32m0^", "^d32s^")" is (a47_40=0x16 & a39_
 
 instr: "BITREV" IDST19_0^"BITREV("^a34_32m0^", "^d32s^")" is (a47_40=0x16 & a39_39=1 & a38_38=0 & a34_32m0 & IDST19_0 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_0; local k:4 = d32s; IDST19_0 = bitrev(a34_32m0, k); }
 
+instr: "MODIFY" IDST19_0^"MODIFY("^a34_32m0^", "^d32s^") (sw)" is (a47_40=0x15 & a39_39=0 & a38_38=0 & a34_32m0 & IDST19_0 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_0; IDST19_0 = a34_32m0 + d32s; }
+
+instr: "MODIFY" IDST19_0^"MODIFY("^a34_32m0^", "^d32s^") (nw)" is (a47_40=0x15 & a39_39=1 & a38_38=0 & a34_32m0 & IDST19_0 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_0; IDST19_0 = a34_32m0 + d32s; }
+
 IDST19_1: is a34_32=0 & a37_35=0 { export I8; }
 IDST19_1: "I9 = " is a34_32=0 & a37_35=1 { export I9; }
 IDST19_1: "I10 = " is a34_32=0 & a37_35=2 { export I10; }
@@ -3296,6 +3301,10 @@ IDST19_1: "I8 = " is a34_32=7 & a37_35=7 { export I8; }
 instr: "MODIFY" IDST19_1^"MODIFY("^a34_32m1^", "^d32s^")" is (a47_40=0x16 & a39_39=0 & a38_38=1 & a34_32m1 & IDST19_1 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_1; IDST19_1 = a34_32m1 + d32s; }
 
 instr: "BITREV" IDST19_1^"BITREV("^a34_32m1^", "^d32s^")" is (a47_40=0x16 & a39_39=1 & a38_38=1 & a34_32m1 & IDST19_1 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_1; local k:4 = d32s; IDST19_1 = bitrev(a34_32m1, k); }
+
+instr: "MODIFY" IDST19_1^"MODIFY("^a34_32m1^", "^d32s^") (sw)" is (a47_40=0x15 & a39_39=0 & a38_38=1 & a34_32m1 & IDST19_1 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_1; IDST19_1 = a34_32m1 + d32s; }
+
+instr: "MODIFY" IDST19_1^"MODIFY("^a34_32m1^", "^d32s^") (nw)" is (a47_40=0x15 & a39_39=1 & a38_38=1 & a34_32m1 & IDST19_1 & a31_16 ; b15_0) [ d32s = (a31_16 << 16) | b15_0; ] { build IDST19_1; IDST19_1 = a34_32m1 + d32s; }
 
 instr: "?20" "" is a47_40=0x17 & a39_33=0 ; b15_0 { local k:4 = 0; stackop(k); }
 

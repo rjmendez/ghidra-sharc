@@ -176,6 +176,16 @@ by `tools/regen.sh` (CI fails if the committed file is stale).
 `sharc214xx.slaspec` is written by hand: spaces, registers, context, macros,
 the `DS`, `LoopTop` and `ISA` subtables and the root table.
 
+## SHARC+ (ADSP-2156x, ADSP-SC5xx)
+
+`SHARC:BE:32:SHARCPLUS` is the 214xx definition with SHARC+'s block bases
+(0x90000/0xb0000/0xc0000/0xe0000), i.e. `SW = 3*A - (A & 0xf0000)` (`BLKMASK` in
+`sharcplus.slaspec`).  The loader also reads SC5xx boot streams (16-byte little-endian block
+headers, bytes XOR to zero): L1 at global 0x28000000 + 2*SW, the FIRST block's target as the
+48-bit entry, and a vector table at the start of block 0 as ISA code.  SHARC+-only instruction
+types and compute opcodes are not modelled; the tables are the 214xx ones plus Type 19a
+`(sw)`/`(nw)`.
+
 ## License
 
 Apache License 2.0, as Ghidra.  See [NOTICE.md](NOTICE.md) for sources.
